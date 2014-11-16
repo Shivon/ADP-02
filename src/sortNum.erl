@@ -12,7 +12,7 @@
 
 %% API
 -export([sortNum/1]).
-%%  random:uniform(N). generiert random int zwischen 1 und N
+
 
 sortNum(Quantity) ->
   generateRandom(Quantity),
@@ -24,6 +24,7 @@ generateRandom(Quantity) ->
   Output = initA(),
   Length = lengthA(Output),
   if
+    %%  random:uniform(N) -> generates random int between 1 and N
     (Length == Quantity-1) -> setA(Output, Quantity-1, random:uniform(1000));
     (Length < Quantity) -> setA(generateRandom(Quantity-1), Quantity-1, random:uniform(1000))
   end.
