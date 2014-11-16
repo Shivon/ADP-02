@@ -9,7 +9,6 @@
 -module(sortNum).
 -author("KamikazeOnRoad").
 -import(arrayS, [initA/0, setA/3, lengthA/1]).
--import(liste, [reverse/1]).
 
 %% API
 -export([sortNum/1]).
@@ -43,4 +42,10 @@ generateWorst(Quantity, Previous) ->
 
 generateBest(Quantity) ->
   reverse(generateWorst(Quantity)).
+
+%% Hilfsfunktion
+reverse(List) -> reverse(List, {}).
+
+reverse({}, NewList) -> NewList;
+reverse({First, Rest}, NewList) -> reverse(Rest, {First,NewList}).
 
