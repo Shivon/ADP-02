@@ -11,11 +11,16 @@
 -import(arrayS, [initA/0, setA/3, lengthA/1]).
 
 %% API
--export([sortNum/1]).
+-export([sortNum/0, sortNum/1]).
+
+%% sortNum/0 generates per default arrays with int and size 10.
+sortNum() ->
+  sortNum(10).
 
 
+%% Parameter of sortNum/1 defines size of the arrays.
 sortNum(Quantity) ->
-  sortNum(Quantity, 80, 10, 10).
+  file:write_file("\zahlen.dat", []), sortNum(Quantity, 80, 10, 10).
 
 sortNum(Quantity, IteratorRandom, IteratorWorst, IteratorBest) ->
   FileName = "\zahlen.dat",
@@ -41,7 +46,6 @@ generateRandom(Quantity) ->
     (Length == Quantity-1) -> setA(Output, Quantity-1, random:uniform(1000));
     (Length < Quantity) -> setA(generateRandom(Quantity-1), Quantity-1, random:uniform(1000))
   end.
-
 
 
 generateWorst(Quantity) ->
