@@ -14,10 +14,11 @@
 -export([sortNum/1]).
 
 
-sortNum(Quantity) ->
+sortNum(Quantity) -> %%TODO: Print Output all functions into zahlen.dat
   generateRandom(Quantity),
   generateWorst(Quantity),
   generateBest(Quantity).
+%%  file:write_file("\zahlen.dat", io_lib:fwrite("~p.\n", [generateBest(Quantity)])).
 
 
 generateRandom(Quantity) ->
@@ -43,6 +44,15 @@ generateWorst(Quantity, Previous) ->
 
 generateBest(Quantity) ->
   reverse(generateWorst(Quantity)).
+
+%% generateBest(Quantity, 10).
+%%
+%% generateBest(Quantity, Loop) ->
+%%   if
+%%     (Loop == 0) -> reverse(generateWorst(Quantity));
+%%     (Loop > 0) -> reverse(generateWorst(Quantity, Loop-1))
+%%   end.
+
 
 %% Hilfsfunktion
 reverse(List) -> reverse(List, {}).
