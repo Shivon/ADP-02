@@ -14,11 +14,23 @@
 -export([sortNum/1]).
 
 
-sortNum(Quantity) -> %%TODO: Print Output all functions into zahlen.dat
-  generateRandom(Quantity),
-  generateWorst(Quantity),
-  generateBest(Quantity).
-%%  file:write_file("\zahlen.dat", io_lib:fwrite("~p.\n", [generateBest(Quantity)])).
+sortNum(Quantity) ->
+  sortNum(Quantity, 80, 10, 10).
+
+sortNum(Quantity, IteratorRandom, IteratorWorst, IteratorBest) ->
+  FileName = "\zahlen.dat",
+  if
+    (IteratorRandom > 0) ->
+      file:write_file(FileName, io_lib:fwrite("~p.\n", [generateRandom(Quantity)]), [append]),
+      sortNum(Quantity, IteratorRandom-1, IteratorWorst, IteratorBest);
+    (IteratorWorst > 0) ->
+      file:write_file(FileName, io_lib:fwrite("~p.\n", [generateWorst(Quantity)]), [append]),
+      sortNum(Quantity, IteratorRandom, IteratorWorst-1, IteratorBest);
+    (IteratorBest > 0) ->
+      file:write_file(FileName, io_lib:fwrite("~p.\n", [generateBest(Quantity)]), [append]),
+      sortNum(Quantity, IteratorRandom, IteratorWorst, IteratorBest-1);
+    true -> ok
+  end.
 
 
 generateRandom(Quantity) ->
@@ -29,6 +41,8 @@ generateRandom(Quantity) ->
     (Length == Quantity-1) -> setA(Output, Quantity-1, random:uniform(1000));
     (Length < Quantity) -> setA(generateRandom(Quantity-1), Quantity-1, random:uniform(1000))
   end.
+
+
 
 generateWorst(Quantity) ->
   generateWorst(Quantity, random:uniform(1000)).
@@ -42,16 +56,9 @@ generateWorst(Quantity, Previous) ->
     (Length < Quantity) -> setA(generateWorst(Quantity-1, Random), Quantity-1, Random)
   end.
 
+
 generateBest(Quantity) ->
-  generateBest(Quantity, 10).
-
-generateBest(Quantity, Loop) ->
-if
-  (Loop == 0) -> reverse(generateWorst(Quantity));
-  (Loop > 0) -> io:format(reverse(generateWorst(Quantity, Loop-1)))
-end.
-
-
+  reverse(generateWorst(Quantity)).
 
 
 %% Hilfsfunktion

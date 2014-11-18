@@ -42,12 +42,9 @@ insertionS({First,{}}, ReturnList, _Von, _Bis, false) ->
 %% Algorithmus ist noch nicht fertig mit tauschen,
 %% beim Durchgehen der Liste im letzten Durchgang wurde immernoch getauscht.
 insertionS({First,{}}, ReturnList, _Von, _Bis, true) ->
-  erlang:display({First,{}}),
   ReturnListNew = arrayS:initA(),
   Pos = arrayS:lengthA(ReturnList),
-  erlang:display(ReturnList),
   ReturnList2 = arrayS:setA(ReturnList, Pos, First),
-  erlang:display(ReturnList2),
   insertionS(ReturnList2, ReturnListNew, _Von, _Bis, false);
 
 
@@ -55,7 +52,6 @@ insertionS({First,{}}, ReturnList, _Von, _Bis, true) ->
 %% Das sich erste anschauende Elemente ist kleiner als das Zweite.
 %% Es muss nicht getauscht werden.
 insertionS({First, {Second, Rest}}, ReturnList, _Von, _Bis, Switched) when First < Second ->
-  erlang:display({First, {Second, Rest}}),
   PosForFirst = arrayS:lengthA(ReturnList),
   NewArray1 = arrayS:setA(ReturnList, PosForFirst, First),
   NewSwitched = (Switched or false),
