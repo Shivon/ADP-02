@@ -14,18 +14,23 @@
 -import(arrayS, [initA/0, setA/3, getA/2, lengthA/1]).
 -import(sortNum, [sortNum/0, sortNum/1]).
 
+logFile() -> "\messung.log".
 
 %% selectionS() ->
 %%   FileName = "\zahlen.dat",
 %%   file:write_file(FileName, io_lib:format("~p",[selectionS()])).
 
 selectionS() ->
-  StartTime = time(), %% save start time for comparison ACHTUNG: keine Millisek + kein Rechnen möglich
   FileName = "\zahlen.dat",
   {ok, Device} = file:open(FileName, [read]),
+  %% Time before Algorithm
+  {_, Seconds, MicroSecs} = now(),
+  %% Algorithm
   selectionS(Device),
-  EndTime = time(),
-  EndTime - StartTime.  %% was nun?
+  %% Time after Algorithm
+  {_, Seconds1, MicroSecs1} = now(),
+  DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
+  writeToFile(DiffTime, newline).
 
 selectionS(Device) ->
   case io:get_line(Device, ".\n") of
@@ -108,3 +113,9 @@ getIndex(Array, Elem, AccuIndex) ->
     (AccuIndex < Length) andalso (ElemAccuIndex =/= Elem) -> getIndex(Array, Elem, AccuIndex+1);
     true -> false
   end.
+
+writeToFile(Data, newline) ->
+  file:write_file(logFile(), io_lib:fwrite("~p\t Millisekunden.\n",   [Data]), [append]);
+
+writeToFile(Data, sameline) ->
+  file:write_file(logFile(), io_lib:fwrite("~p\t Taeusche bei\t",   [Data]), [append]).

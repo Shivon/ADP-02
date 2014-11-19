@@ -21,7 +21,6 @@ insertionS_test() ->
   A7 = arrayS:setA(A6,5,5),
   ?assertEqual({3,{4,{5,{8,{41,{98,{}}}}}}}, insertionSort:insertionS(A7,0,5)),
   ?assertEqual({3,{4,{41,{98,{8,{5,{}}}}}}}, insertionSort:insertionS(A7,1,3)).
-%%   ?assertError({}, insertionSort:insertionS(A7,0,6)).
 
 unsortedFront_test() ->
   A1 = arrayS:initA(),
