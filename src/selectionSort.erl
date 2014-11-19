@@ -10,15 +10,34 @@
 -author("KamikazeOnRoad").
 
 %% API
--export([selectionS/3]).
+-export([selectionS/0, selectionS/3]).
 -import(arrayS, [initA/0, setA/3, getA/2, lengthA/1]).
+-import(sortNum, [sortNum/0, sortNum/1]).
 
 
-%%TODO: ASK: gibt es eine andere Methode for Loops außer Auslagern??! So echt hässliche Signaturen etc...
+%% selectionS() ->
+%%   FileName = "\zahlen.dat",
+%%   file:write_file(FileName, io_lib:format("~p",[selectionS()])).
+
+selectionS() ->
+  StartTime = time(), %% save start time for comparison ACHTUNG: keine Millisek + kein Rechnen möglich
+  FileName = "\zahlen.dat",
+  {ok, Device} = file:open(FileName, [read]),
+  selectionS(Device),
+  EndTime = time(),
+  EndTime - StartTime.  %% was nun?
+
+selectionS(Device) ->
+  case io:get_line(Device, ".\n") of
+    eof  -> [];
+    Line -> selectionS(Line), selectionS(Device)
+  end.
+
 
 %% Von = Index from which you want to start sorting
 %% Bis = Index which shall be the last sorted
 selectionS(Array, Von, Bis) ->
+  %% TODO: es soll kompletter Array zurückgegeben werden -> destruktiv veränderter alter Array
   selectionS(getSectorArray(Array, Von, Bis), initA(), 0, 0).
 
 selectionS(Array, SortedArray, CountSortedElem, _) ->
