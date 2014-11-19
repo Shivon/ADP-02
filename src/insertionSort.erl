@@ -30,8 +30,13 @@ insertionS(Array, Von, Bis) ->
       ArrayNotToSort1 = unsortedFront(Array, List, Von), %% gibt den ersten Teil zurück, der nicht mit sortiert werden soll
       ArrayToSort = sortedPart(Array, List, 0, Von, Bis),    %% gibt den zu sortierenden Teil zurück.
       ArrayNotToSort2 = unsortedEnd(Array, List, Bis+1),
+%%       StartZeit = erlang:current_time(),
+%%       erlang:display(StartZeit),
       %% Algorithmus ausführen
       NewSortedArray = insertionS(ArrayToSort,List, Von, Bis, false),
+      EndZeit = erlang:time(),
+      erlang:display(EndZeit),
+%%       erlang:display(EndZeit-StartZeit),
       %% Konkatinieren zur Rückgabeliste
       ArrayConcat = concatTwoArray(ArrayNotToSort1, NewSortedArray),
       concatTwoArray(ArrayConcat, ArrayNotToSort2).
@@ -71,7 +76,6 @@ insertionS({First, {Second, Rest}}, ReturnList, _Von, _Bis, Switched) when First
 %% Das sich erste anschauende Elemente ist großer als das Zweite.
 %% Es muss getauscht werden.
 insertionS({First, {Second, Rest}}, ReturnList, _Von, _Bis, Switched) when First > Second ->
-  erlang:display({First, {Second, Rest}}),
   PosForSecond = arrayS:lengthA(ReturnList),
   NewArray1 = arrayS:setA(ReturnList, PosForSecond, Second),
   NewSwitched = (Switched or true),
