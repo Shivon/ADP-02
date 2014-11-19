@@ -23,63 +23,61 @@
 
 
 insertionS(Array, Von, Bis) ->
-%%   Length = arrayS:lengthA(Array),
-%%   if
-%%     (Length >= Bis) ->
       List = arrayS:initA(),
       ArrayNotToSort1 = unsortedFront(Array, List, Von), %% gibt den ersten Teil zurück, der nicht mit sortiert werden soll
       ArrayToSort = sortedPart(Array, List, 0, Von, Bis),    %% gibt den zu sortierenden Teil zurück.
       ArrayNotToSort2 = unsortedEnd(Array, List, Bis+1),
-%%       StartZeit = erlang:current_time(),
-%%       erlang:display(StartZeit),
+
+      %% Zeit vor dem Algorithmus
+      {_, Seconds, MicroSecs} = now(),
+
       %% Algorithmus ausführen
-      NewSortedArray = insertionS(ArrayToSort,List, Von, Bis, false),
-      EndZeit = erlang:time(),
-      erlang:display(EndZeit),
-%%       erlang:display(EndZeit-StartZeit),
+      NewSortedArray = insertionS(ArrayToSort, List, 0, false),
+      %% Zeit nach dem Algorithmus
+      {_, Seconds1, MicroSecs1} = now(),
+      erlang:display((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
+
       %% Konkatinieren zur Rückgabeliste
       ArrayConcat = concatTwoArray(ArrayNotToSort1, NewSortedArray),
       concatTwoArray(ArrayConcat, ArrayNotToSort2).
-%%     true ->
-%%       erlang:error("Die Obere Grenze der zu sortierende Liste befindet sich nicht mehr im Array")
-%%   end.
+
 
 
 
 
 %% Algorithmus ist mit dem gesamten tauschen fertig,
 %% im letzten Durchgang wurde nicht mehr getauscht.
-insertionS({First,{}}, ReturnList, _Von, _Bis, false) ->
+insertionS({First,{}}, ReturnList, Swapcount, false) ->
   Pos = arrayS:lengthA(ReturnList),
   ReturnList2 = arrayS:setA(ReturnList, Pos, First),
-  ReturnList2;
+  erlang:display(Swapcount), ReturnList2;
 
 
 %% Algorithmus ist noch nicht fertig mit tauschen,
 %% beim Durchgehen der Liste im letzten Durchgang wurde immernoch getauscht.
-insertionS({First,{}}, ReturnList, _Von, _Bis, true) ->
+insertionS({First,{}}, ReturnList, _Swapcount, true) ->
   ReturnListNew = arrayS:initA(),
   Pos = arrayS:lengthA(ReturnList),
   ReturnList2 = arrayS:setA(ReturnList, Pos, First),
-  insertionS(ReturnList2, ReturnListNew, _Von, _Bis, false);
+  insertionS(ReturnList2, ReturnListNew, _Swapcount, false);
 
 
 %% Das sich erste anschauende Elemente ist kleiner als das Zweite.
 %% Es muss nicht getauscht werden.
-insertionS({First, {Second, Rest}}, ReturnList, _Von, _Bis, Switched) when First < Second ->
+insertionS({First, {Second, Rest}}, ReturnList, _Swapcount, Switched) when First < Second ->
   PosForFirst = arrayS:lengthA(ReturnList),
   NewArray1 = arrayS:setA(ReturnList, PosForFirst, First),
   NewSwitched = (Switched or false),
-  insertionS({Second, Rest}, NewArray1, _Von, _Bis, NewSwitched);
+  insertionS({Second, Rest}, NewArray1, _Swapcount, NewSwitched);
 
 
 %% Das sich erste anschauende Elemente ist großer als das Zweite.
 %% Es muss getauscht werden.
-insertionS({First, {Second, Rest}}, ReturnList, _Von, _Bis, Switched) when First > Second ->
+insertionS({First, {Second, Rest}}, ReturnList, Swapcount, Switched) when First > Second ->
   PosForSecond = arrayS:lengthA(ReturnList),
   NewArray1 = arrayS:setA(ReturnList, PosForSecond, Second),
   NewSwitched = (Switched or true),
-  insertionS({First, Rest}, NewArray1, _Von, _Bis, NewSwitched).
+  insertionS({First, Rest}, NewArray1, Swapcount+1, NewSwitched).
 
 
 
