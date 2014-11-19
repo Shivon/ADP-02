@@ -9,11 +9,13 @@
 -module(insertionSort).
 
 %% API
--export([insertionS/3, unsortedFront/3, sortedPart/5, unsortedEnd/3, concatTwoArray/2]).
+-export([insertionS/3, unsortedFront/2, sortedPart/3, unsortedEnd/2, concatTwoArray/2]).
+
+%% "Konstante"
+logFile() -> "\messung.log".
 
 
-
-%% Wahrheitstafel:
+%%  Wahrheitstafel:
 %% __A___B____A_v_B__
 %% | 0   0 |    0   |
 %% | 0   1 |    1   |
@@ -24,18 +26,18 @@
 
 insertionS(Array, Von, Bis) ->
       List = arrayS:initA(),
-      ArrayNotToSort1 = unsortedFront(Array, List, Von), %% gibt den ersten Teil zurück, der nicht mit sortiert werden soll
-      ArrayToSort = sortedPart(Array, List, 0, Von, Bis),    %% gibt den zu sortierenden Teil zurück.
-      ArrayNotToSort2 = unsortedEnd(Array, List, Bis+1),
+      ArrayNotToSort1 = unsortedFront(Array, Von),  %% unsortedFront: gibt den ersten Teil zurück, der nicht mit sortiert werden soll zurück.
+      ArrayToSort = sortedPart(Array, Von, Bis), %% sortedPart: gibt den zu sortierenden Teil zurück.
+      ArrayNotToSort2 = unsortedEnd(Array, Bis+1),  %% unsortedEnd: gibt den hinteren Teil, der nicht mit sortiert werden soll zurück.
 
       %% Zeit vor dem Algorithmus
       {_, Seconds, MicroSecs} = now(),
-
       %% Algorithmus ausführen
       NewSortedArray = insertionS(ArrayToSort, List, 0, false),
       %% Zeit nach dem Algorithmus
       {_, Seconds1, MicroSecs1} = now(),
-      erlang:display((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
+      DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
+      writeToFile(DiffTime, newline),
 
       %% Konkatinieren zur Rückgabeliste
       ArrayConcat = concatTwoArray(ArrayNotToSort1, NewSortedArray),
@@ -50,7 +52,8 @@ insertionS(Array, Von, Bis) ->
 insertionS({First,{}}, ReturnList, Swapcount, false) ->
   Pos = arrayS:lengthA(ReturnList),
   ReturnList2 = arrayS:setA(ReturnList, Pos, First),
-  erlang:display(Swapcount), ReturnList2;
+  writeToFile(Swapcount, sameline),
+  ReturnList2;
 
 
 %% Algorithmus ist noch nicht fertig mit tauschen,
@@ -62,7 +65,7 @@ insertionS({First,{}}, ReturnList, _Swapcount, true) ->
   insertionS(ReturnList2, ReturnListNew, _Swapcount, false);
 
 
-%% Das sich erste anschauende Elemente ist kleiner als das Zweite.
+%% Das erste angeschaute Elemente ist kleiner als das Zweite.
 %% Es muss nicht getauscht werden.
 insertionS({First, {Second, Rest}}, ReturnList, _Swapcount, Switched) when First < Second ->
   PosForFirst = arrayS:lengthA(ReturnList),
@@ -71,7 +74,7 @@ insertionS({First, {Second, Rest}}, ReturnList, _Swapcount, Switched) when First
   insertionS({Second, Rest}, NewArray1, _Swapcount, NewSwitched);
 
 
-%% Das sich erste anschauende Elemente ist großer als das Zweite.
+%% Das erste angeschaute Elemente ist großer als das Zweite.
 %% Es muss getauscht werden.
 insertionS({First, {Second, Rest}}, ReturnList, Swapcount, Switched) when First > Second ->
   PosForSecond = arrayS:lengthA(ReturnList),
@@ -84,15 +87,17 @@ insertionS({First, {Second, Rest}}, ReturnList, Swapcount, Switched) when First 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%   HILFSFUNKTIONEN  %%
-%%     - unsortedFront/3
-%%     - sortedPart/5
-%%     - unsortedEnd/3
+%%     - unsortedFront/2
+%%     - sortedPart/3
+%%     - unsortedEnd/2
 %%     - concatTwoArray/2
+%%     - writeToFile/2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Array x NewArray x PosAt x BisIndex -> NewArray
+%% Array x NewArray x  BisIndex -> NewArray
 %% Gibt den nicht zu sortierenden Teil aus der vor dem zu sortierenden Teil steht
-unsortedFront(Array, NewArray,  BisIndex) ->
+unsortedFront(Array, BisIndex) ->
+  NewArray = arrayS:initA(),
   unsortedFront(Array, NewArray, 0,  BisIndex).
 
 unsortedFront(_Array, NewArray, _PosAt,  BisIndex) when BisIndex == 0 ->
@@ -108,6 +113,11 @@ unsortedFront(Array, NewArray, PosAt,  BisIndex) ->
 
 
 
+
+
+sortedPart(Array, VonIndex, BisIndex) ->
+  NewArray = arrayS:initA(),
+  sortedPart(Array, NewArray, 0, VonIndex, BisIndex).
 
 %% Array x NewArray x PosAt x VonIndex x BisIndex -> NewArray
 %% Gibt den zu sortierenden Teil aus
@@ -129,10 +139,13 @@ unsortedFront(Array, NewArray, PosAt,  BisIndex) ->
 
 
 
+
+
 %% unsortedEnd: Array x Array x Startindex -> Array
 %% Gibt den Endteil des Arrays aus was nicht sortiert werden soll
-unsortedEnd(Array, NewArray, VonIndex) ->
-   unsortedEnd(Array, NewArray, 0, VonIndex).
+unsortedEnd(Array, VonIndex) ->
+   NewArray = arrayS:initA(),
+  unsortedEnd(Array, NewArray, 0, VonIndex).
 
 unsortedEnd(Array, NewArray, PosAt, VonIndex) when PosAt < VonIndex ->
     NewPosAt = PosAt + 1,
@@ -173,4 +186,8 @@ unsortedEnd(Array, NewArray, PosAt, VonIndex)  ->
     end.
 
 
+writeToFile(Data, newline) ->
+  file:write_file(logFile(), io_lib:fwrite("~p\t Millisekunden.\n",   [Data]), [append]);
 
+writeToFile(Data, sameline) ->
+  file:write_file(logFile(), io_lib:fwrite("~p\t Taeusche bei\t",   [Data]), [append]).

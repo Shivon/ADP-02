@@ -31,9 +31,9 @@ unsortedFront_test() ->
   A5 = arrayS:setA(A4,3,4),
   A6 = arrayS:setA(A5,4,8),
   A7 = arrayS:setA(A6,5,5),
-  ?assertEqual({3,{98,{41,{}}}}, insertionSort:unsortedFront(A7, {},  3)),
-  ?assertEqual({}, insertionSort:unsortedFront(A7, {},  0)),
-  ?assertEqual({3,{98,{41,{4,{8,{5,{}}}}}}}, insertionSort:unsortedFront(A7, {},  6)).
+  ?assertEqual({3,{98,{41,{}}}}, insertionSort:unsortedFront(A7, 3)),
+  ?assertEqual({}, insertionSort:unsortedFront(A7, 0)),
+  ?assertEqual({3,{98,{41,{4,{8,{5,{}}}}}}}, insertionSort:unsortedFront(A7, 6)).
 
 concatTwoArray_test() ->
   A1 = arrayS:initA(),
@@ -53,7 +53,7 @@ sortedPart_test() ->
   A5 = arrayS:setA(A4,3,4),
   A6 = arrayS:setA(A5,4,8),
   A7 = arrayS:setA(A6,5,5),
-  ?assertEqual({41,{4,{8,{}}}}, insertionSort:sortedPart(A7, {}, 0, 2, 4)).
+  ?assertEqual({41,{4,{8,{}}}}, insertionSort:sortedPart(A7, 2, 4)).
 
 unsortedEnd_test() ->
   A1 = arrayS:initA(),
@@ -63,6 +63,6 @@ unsortedEnd_test() ->
   A5 = arrayS:setA(A4,3,4),
   A6 = arrayS:setA(A5,4,8),
   A7 = arrayS:setA(A6,5,5),
-  ?assertEqual({8,{5,{}}}, insertionSort:unsortedEnd(A7, {}, 4)).
+  ?assertEqual({8,{5,{}}}, insertionSort:unsortedEnd(A7, 4)).
 
 
