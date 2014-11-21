@@ -17,19 +17,6 @@
 logFile() -> "\messung.log".
 
 
-%% selectionS() ->
-%%   FileName = "\zahlen.dat",
-%%   {ok, Device} = file:open(FileName, [read]),
-%%   %% Time before Algorithm
-%%   {_, Seconds, MicroSecs} = now(),
-%%   %% Algorithm
-%%   selectionS(Device),
-%%   %% Time after Algorithm
-%%   {_, Seconds1, MicroSecs1} = now(),
-%%   DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
-%%   writeToFile(DiffTime, newline).
-
-
 %% Uses as input array as default the arrays of integers in zahlen.dat
 %% Sorts automatically all integers in each line
 selectionS() ->
@@ -64,22 +51,24 @@ selectionSortOverTuples([Tuple|Rest]) ->
 
 
 
-
 %% Von = Index from which you want to start sorting
 %% Bis = Index which shall be the last sorted
 selectionS(Array, Von, Bis) ->
-  %% Time before Algorithm
-%%   {_, Seconds, MicroSecs} = now(),
-  %% TODO: es soll kompletter Array zurückgegeben werden -> destruktiv veränderter alter Array
-  selectionS(getSectorArray(Array, Von, Bis), initA(), 0, 0).
-%%   %% Time after Algorithm
-%%   {_, Seconds1, MicroSecs1} = now(),
-%%   DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
-%%   writeToFile(DiffTime, newline).
+  UnsortedFront = insertionSort:unsortedFront(Array, Von),
 
+  %% Time before algorithm
+  {_, SecondsStart, MicroSecsStart} = now(),
 
+  %% Calls algorithm and sorts
+  SortedArray = selectionS(getSectorArray(Array, Von, Bis), initA(), 0, 0),
 
+  %% Time after algorithm
+  {_, SecondsEnd, MicroSecsEnd} = now(),
+  DiffTime = ((SecondsEnd - SecondsStart)+(MicroSecsEnd - MicroSecsStart)/1000000),
+  writeToFile(DiffTime, newline),
 
+  UnsortedEnd = insertionSort:unsortedEnd(Array, Bis+1),
+  insertionSort:concatTwoArray(insertionSort:concatTwoArray(UnsortedFront, SortedArray), UnsortedEnd).
 
 
 selectionS(Array, SortedArray, CountSortedElem, _) ->
@@ -125,10 +114,10 @@ getMinimum(Array, ActualIndex, Minimum) ->
   Length = lengthA(Array),
   ActualElem = getA(Array, ActualIndex),
   if
-    (ActualElem < Minimum) and (ActualIndex =:= Length-1) -> ActualElem;
-    (ActualElem < Minimum) and (ActualIndex < Length-1) -> getMinimum(Array, ActualIndex+1, ActualElem);
-    (ActualElem >= Minimum) and (ActualIndex =:= Length-1) -> Minimum;
-    (ActualElem >= Minimum) and (ActualIndex < Length-1) -> getMinimum(Array, ActualIndex+1, Minimum)
+    (ActualElem =< Minimum) and (ActualIndex =:= Length-1) -> ActualElem;
+    (ActualElem =< Minimum) and (ActualIndex < Length-1) -> getMinimum(Array, ActualIndex+1, ActualElem);
+    (ActualElem > Minimum) and (ActualIndex =:= Length-1) -> Minimum;
+    (ActualElem > Minimum) and (ActualIndex < Length-1) -> getMinimum(Array, ActualIndex+1, Minimum)
   end.
 
 
@@ -152,7 +141,4 @@ getIndex(Array, Elem, AccuIndex) ->
   end.
 
 writeToFile(Data, newline) ->
-  file:write_file(logFile(), io_lib:fwrite("~p\t Millisekunden.\n",   [Data]), [append]);
-
-writeToFile(Data, sameline) ->
-  file:write_file(logFile(), io_lib:fwrite("~p\t Taeusche bei\t",   [Data]), [append]).
+  file:write_file(logFile(), io_lib:fwrite("~p\t Millisekunden.\n",   [Data]), [append]).

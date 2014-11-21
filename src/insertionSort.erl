@@ -57,8 +57,6 @@ insertionSortOverTuples([Tuple|Rest]) ->
 
 
 insertionS(Array, Von, Bis) ->
-  %% TODO: Fix bug, adds 0 at beginning of all sorted arrays
-  %% Cause: if Bis >= Length Array it adds 0 at beginning of arrayToSort
       List = arrayS:initA(),
       ArrayNotToSort1 = unsortedFront(Array, Von),  %% unsortedFront: gibt den ersten Teil zurück, der nicht mit sortiert werden soll zurück.
       ArrayToSort = sortedPart(Array, Von, Bis), %% sortedPart: gibt den zu sortierenden Teil zurück.
@@ -226,4 +224,4 @@ writeToFile(Data, newline) ->
   file:write_file(logFile(), io_lib:fwrite("~p\t Millisekunden.\n",   [Data]), [append]);
 
 writeToFile(Data, sameline) ->
-  file:write_file(logFile(), io_lib:fwrite("~p\t Taeusche bei\t",   [Data]), [append]).
+  file:write_file(logFile(), io_lib:fwrite("~p\t Tausche bei\t",   [Data]), [append]).
