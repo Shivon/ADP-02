@@ -9,7 +9,7 @@
 -module(insertionSort).
 
 %% API
--export([insertionS/3, unsortedFront/2, sortedPart/3, unsortedEnd/2, concatTwoArray/2]).
+-export([insertionS/0, insertionS/1, insertionS/3, unsortedFront/2, sortedPart/3, unsortedEnd/2, concatTwoArray/2]).
 
 %% "Konstante"
 logFile() -> "\messung.log".
@@ -23,8 +23,42 @@ logFile() -> "\messung.log".
 %% |_1___1_|____1___|
 %%
 
+%% Uses as input array as default the arrays of integers in zahlen.dat
+%% Sorts automatically all integers in each line
+insertionS() ->
+  insertionSortOverFileLines("\zahlen.dat").
+
+%% Name of file can be manually entered if you wish to use another file
+insertionS(FileName) ->
+  insertionSortOverFileLines(FileName).
+
+%% Opens file and iterates over all tuples
+insertionSortOverFileLines(FileName) ->
+  %% Returns {ok, List of all tuples}
+  Tuples = tuple_to_list(file:consult(FileName)),
+  % Initializes output file
+  file:write_file("sortiert.dat", []),
+  %% We need to pick last element of list because of "ok" return in Tuples
+  insertionSortOverTuples(lists:last(Tuples)).
+
+%% Exit condition: List of Tuples only has one element (left)
+insertionSortOverTuples([Tuple]) ->
+  FileName = "sortiert.dat",
+  Von = 0,
+  Bis = arrayS:lengthA(Tuple),
+  file:write_file(FileName, io_lib:fwrite("~p.\n", [insertionS(Tuple, Von, Bis)]), [append]);
+%% Picks head of list, recursive call
+insertionSortOverTuples([Tuple|Rest]) ->
+  FileName = "sortiert.dat",
+  Von = 0,
+  Bis = arrayS:lengthA(Tuple),
+  file:write_file(FileName, io_lib:fwrite("~p.\n", [insertionS(Tuple, Von, Bis)]), [append]),
+  insertionSortOverTuples(Rest).
+
 
 insertionS(Array, Von, Bis) ->
+  %% TODO: Fix bug, adds 0 at beginning of all sorted arrays
+  %% Cause: if Bis >= Length Array it adds 0 at beginning of arrayToSort
       List = arrayS:initA(),
       ArrayNotToSort1 = unsortedFront(Array, Von),  %% unsortedFront: gibt den ersten Teil zurück, der nicht mit sortiert werden soll zurück.
       ArrayToSort = sortedPart(Array, Von, Bis), %% sortedPart: gibt den zu sortierenden Teil zurück.
@@ -113,11 +147,13 @@ unsortedFront(Array, NewArray, PosAt,  BisIndex) ->
 
 
 
-
-
 sortedPart(Array, VonIndex, BisIndex) ->
   NewArray = arrayS:initA(),
-  sortedPart(Array, NewArray, 0, VonIndex, BisIndex).
+  LastIndex = arrayS:lengthA(Array)-1,
+  if
+    (LastIndex < BisIndex) -> sortedPart(Array, NewArray, 0, VonIndex, LastIndex);
+    true -> sortedPart(Array, NewArray, 0, VonIndex, BisIndex)
+  end.
 
 %% Array x NewArray x PosAt x VonIndex x BisIndex -> NewArray
 %% Gibt den zu sortierenden Teil aus

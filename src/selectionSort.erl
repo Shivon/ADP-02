@@ -10,40 +10,77 @@
 -author("KamikazeOnRoad").
 
 %% API
--export([selectionS/0, selectionS/3]).
+-export([selectionS/0, selectionS/1, selectionS/3]).
 -import(arrayS, [initA/0, setA/3, getA/2, lengthA/1]).
 -import(sortNum, [sortNum/0, sortNum/1]).
 
 logFile() -> "\messung.log".
 
+
 %% selectionS() ->
 %%   FileName = "\zahlen.dat",
-%%   file:write_file(FileName, io_lib:format("~p",[selectionS()])).
+%%   {ok, Device} = file:open(FileName, [read]),
+%%   %% Time before Algorithm
+%%   {_, Seconds, MicroSecs} = now(),
+%%   %% Algorithm
+%%   selectionS(Device),
+%%   %% Time after Algorithm
+%%   {_, Seconds1, MicroSecs1} = now(),
+%%   DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
+%%   writeToFile(DiffTime, newline).
 
+
+%% Uses as input array as default the arrays of integers in zahlen.dat
+%% Sorts automatically all integers in each line
 selectionS() ->
-  FileName = "\zahlen.dat",
-  {ok, Device} = file:open(FileName, [read]),
-  %% Time before Algorithm
-  {_, Seconds, MicroSecs} = now(),
-  %% Algorithm
-  selectionS(Device),
-  %% Time after Algorithm
-  {_, Seconds1, MicroSecs1} = now(),
-  DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
-  writeToFile(DiffTime, newline).
+  selectionSortOverFileLines("\zahlen.dat").
 
-selectionS(Device) ->
-  case io:get_line(Device, ".\n") of
-    eof  -> [];
-    Line -> selectionS(Line), selectionS(Device)
-  end.
+%% Name of file can be manually entered if you wish to use another file
+selectionS(FileName) ->
+  selectionSortOverFileLines(FileName).
+
+%% Opens file and iterates over all tuples
+selectionSortOverFileLines(FileName) ->
+  %% Returns {ok, List of all tuples}
+  Tuples = tuple_to_list(file:consult(FileName)),
+  % Initializes output file
+  file:write_file("sortiert.dat", []),
+  %% We need to pick last element of list because of "ok" return in Tuples
+  selectionSortOverTuples(lists:last(Tuples)).
+
+%% Exit condition: List of Tuples only has one element (left)
+selectionSortOverTuples([Tuple]) ->
+  FileName = "sortiert.dat",
+  Von = 0,
+  Bis = lengthA(Tuple),
+  file:write_file(FileName, io_lib:fwrite("~p.\n", [selectionS(Tuple, Von, Bis)]), [append]);
+%% Picks head of list, recursive call
+selectionSortOverTuples([Tuple|Rest]) ->
+  FileName = "sortiert.dat",
+  Von = 0,
+  Bis = lengthA(Tuple),
+  file:write_file(FileName, io_lib:fwrite("~p.\n", [selectionS(Tuple, Von, Bis)]), [append]),
+  selectionSortOverTuples(Rest).
+
+
 
 
 %% Von = Index from which you want to start sorting
 %% Bis = Index which shall be the last sorted
 selectionS(Array, Von, Bis) ->
+  %% Time before Algorithm
+%%   {_, Seconds, MicroSecs} = now(),
   %% TODO: es soll kompletter Array zurückgegeben werden -> destruktiv veränderter alter Array
   selectionS(getSectorArray(Array, Von, Bis), initA(), 0, 0).
+%%   %% Time after Algorithm
+%%   {_, Seconds1, MicroSecs1} = now(),
+%%   DiffTime = ((Seconds1-Seconds)+(MicroSecs1-MicroSecs)/1000000),
+%%   writeToFile(DiffTime, newline).
+
+
+
+
+
 
 selectionS(Array, SortedArray, CountSortedElem, _) ->
   Length = lengthA(Array),
